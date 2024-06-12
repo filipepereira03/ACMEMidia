@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
-import java.lang.Math;
+
 
 public class ACMEMidia {
 
@@ -175,20 +175,16 @@ public class ACMEMidia {
 	}
 
 	/** 5: Aqui é a mesma lógica da 4 porém utilizo instanceOf
-	 * Dps de criar uma lista pra armazenar os videos com n qualidades
-	 * eu verifico se a midia atual é uma instancia de video (o que é necessário pois só videos tem qualidade)
-	 * e também forço a checagem da qualidade de m
+	 * (Midiateca) Dps de criar uma lista pra armazenar os videos com n qualidades
+	 * (Midiateca) eu verifico se a midia atual é uma instancia de video (o que é necessário pois só videos tem qualidade)
+	 * (Midiateca) e também forço a checagem da qualidade de m
+	 * Transformei tudo isso acima em um método na classe midiateca, diferente da versão anterior
 	 * Atendendo aos critérios, é adicionado um vídeo
  	 */
 	private void mostrarDadosQualidade() {
 		int qualidade = Integer.parseInt(entrada.nextLine());
 
-		ArrayList<Video> videos = new ArrayList<>();
-		for (Midia m : midiateca.getMidia()) {
-			if (m instanceof Video && ((Video) m).getQualidade() == qualidade) {
-				videos.add((Video) m);
-			}
-		}
+		ArrayList<Video> videos = midiateca.filtraQualidade(qualidade);
 
 		if (videos.isEmpty()) {
 			System.out.println("5: Qualidade inexistente");
@@ -196,6 +192,7 @@ public class ACMEMidia {
 			StringBuilder dados = new StringBuilder();
 
 			for (Video v : videos) {
+				DecimalFormat df = new DecimalFormat("#.00");
 				dados.append("5: ").append(v.toStringDados()).append("\n");
 			}
 
@@ -208,20 +205,12 @@ public class ACMEMidia {
 	}
 
 	/** 6. Esse método foi bem interessante de se fazer
-	 * Utilizo novamente o instanceOf para verificar se é uma instancia de musica o dado passado
-	 * Logo dps crio uma variável 'auxiliar' e converto ela para música de uma maneira segura, considerando que já foi verificada a instancia
+	 * (Midiateca) Utilizo novamente o instanceOf para verificar se é uma instancia de musica o dado passado
+	 * (Midiateca) Logo dps crio uma variável 'auxiliar' e converto ela para música de uma maneira segura, considerando que já foi verificada a instancia
+	 * Transformei tudo isso acima em um método na classe midiateca, diferente da versão anterior
 	 */
 	private void mostrarDadosDuracao() {
-		Musica maiorDuracao = null;
-
-		for (Midia m : midiateca.getMidia()) {
-			if (m instanceof Musica) {
-				Musica musicaAtual = (Musica) m;
-				if (maiorDuracao == null || musicaAtual.getDuracao() > maiorDuracao.getDuracao()) {
-					maiorDuracao = musicaAtual;
-				}
-			}
-		}
+		Musica maiorDuracao = midiateca.encontraMaiorDuracao();
 
 		if (maiorDuracao == null) {
 			System.out.println("6: Nenhuma musica encontrada.");
@@ -254,86 +243,43 @@ public class ACMEMidia {
 	 */
 
 	private void mostrarSomatorio() {
-		double somatorio = 0;
-		ArrayList<Midia> lista = midiateca.getMidia();
+		double somatorio = midiateca.calculaSomatorio();
 
-		if (lista.isEmpty()) {
+		if (somatorio == 0) {
 			System.out.println("8: Nenhuma midia encontrada.");
-			return;
+		} else {
+			System.out.println("8: " + somatorio);
 		}
-
-		for (Midia m : lista) {
-			somatorio += m.calculaLocacao();
-		}
-
-		System.out.println("8: " + somatorio);
-
 	}
 
 	// Métodos extras
 
 	private void musicaProximaMedia() {
-		ArrayList<Musica> musicas = new ArrayList<>();
+		Musica musicaMaisProx = midiateca.encontraMaisProxMedia();
 
-		for (Midia m : midiateca.getMidia()) {
-			if (m instanceof Musica) { // Polimorfismo
-				musicas.add((Musica) m); // Cast
-			}
-		}
-
-		if (musicas.isEmpty()) {
+		if (musicaMaisProx == null) {
 			System.out.println("9: Nenhuma musica encontrada.");
-			return;
+		} else {
+			double mediaLoc = midiateca.calculaMediaLocacaoMusicas();
+			DecimalFormat df = new DecimalFormat("#.##");
+
+			StringBuilder dados = new StringBuilder("9: ");
+			dados.append(df.format(mediaLoc)).append(", ");
+			dados.append(musicaMaisProx.toStringDados());
+			System.out.println(dados);
 		}
-
-		double mediaLoc = 0;
-		for (Musica m : musicas) {
-			mediaLoc += m.calculaLocacao();
-		}
-
-		mediaLoc /= musicas.size(); // Divido pela quantidade de musicas para obter uma média
-
-		Musica musicaMaisProx = null;
-		double menorDiferenca = Double.MAX_VALUE;
-
-		for (Musica m : musicas) {
-			double diferenca = Math.abs(m.calculaLocacao() - mediaLoc); // Calculo da diferença absoluta entre musica atual e médiaLoc
-			if (diferenca < menorDiferenca) { // Verifico as diferenças para ir substituindo
-				menorDiferenca = diferenca;
-				musicaMaisProx = m;
-			}
-		}
-
-		DecimalFormat df = new DecimalFormat("#.##");
-
-		// StringBuilder igual os outros até então
-		StringBuilder dados = new StringBuilder("9: ");
-		dados.append(df.format(mediaLoc)).append(", ");
-		dados.append(musicaMaisProx.toStringDados());
-		System.out.println(dados);
 	}
 
 	// 10: Método para achar a midia mais nova, só vou comparando as midias e vendo os anos com o getAno
 	private void midiaMaisNova() {
-		ArrayList<Midia> midias = midiateca.getMidia();
+		Midia midiaNova = midiateca.encontrarMidiaMaisNova();
 
-		if (midias.isEmpty()) {
-			System.out.println("10: Nenhuma midia encontrada.");
-			return;
+		if (midiaNova == null) {
+			System.out.println("10: Nenhuma midia encontrada");
+		} else {
+			System.out.println("10: " + midiaNova.getCodigo() + ", " + midiaNova.getTitulo() + ", " + midiaNova.getAno());
 		}
-
-		Midia midiaNova = midias.getFirst();
-
-		for (Midia m : midias) {
-			if (m.getAno() > midiaNova.getAno()) {
-				midiaNova = m;
-			}
-		}
-
-		System.out.println("10: " + midiaNova.getCodigo() + ", " + midiaNova.getTitulo() + ", " + midiaNova.getAno());
 	}
-
-
 }
 
 

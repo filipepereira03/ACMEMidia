@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 public class Musica extends Midia {
 
 	private double duracao;
-	private DecimalFormat df = new DecimalFormat("#.##");
+	private DecimalFormat df = new DecimalFormat("#.00");
 
 	public Musica(int codigo, String titulo, int ano, Categoria categoria, double duracao) {
 		super(codigo, titulo, ano, categoria);
