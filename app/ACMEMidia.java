@@ -21,7 +21,7 @@ public class ACMEMidia {
 
 	public ACMEMidia() {
 		try {
-			BufferedReader streamEntrada = new BufferedReader(new FileReader("entradaDadosExtras.txt"));
+			BufferedReader streamEntrada = new BufferedReader(new FileReader("entradaErro.txt"));
 			entrada = new Scanner(streamEntrada);   // Usa como entrada um arquivo
 			PrintStream streamSaida = new PrintStream(new File("saida.txt"), Charset.forName("UTF-8"));
 			System.setOut(streamSaida);             // Usa como saida um arquivo
